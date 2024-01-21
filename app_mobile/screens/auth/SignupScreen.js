@@ -9,44 +9,55 @@ import {
   TouchableOpacity,
 } from "react-native";
 import React, { useState } from "react";
-import  colors from "../../colors/Colors";
+import colors from "../../colors/Colors";
 import CustomInput from "../../components/CustomInput/CustomInput";
 import CustomButton from "../../components/CustomButton/CustomButton";
 import { Ionicons } from "@expo/vector-icons";
-import CustomAlert from "../../components/CustomAlert/CustomAlert";
 import InternetConnectionAlert from "react-native-internet-connection-alert";
-
+import user_service from "../../services/frontend/user_service";
 const SignupScreen = ({ navigation }) => {
   const [email, setEmail] = useState("");
   const [password, setPassword] = useState("");
   const [confirmPassword, setConfirmPassword] = useState("");
   const [name, setName] = useState("");
-  const [error, setError] = useState("");
+  const [user_name, setUserName] = useState("");
+  const [phone, setPhone] = useState("");
 
- 
-
-  const signUpHandle = () => {
+  const signUpHandle = async () => {
     if (email == "") {
-      return setError("Please enter your email");
+      return alert("Please enter your email");
     }
     if (name == "") {
-      return setError("Please enter your name");
+      return alert("Please enter your name");
     }
     if (password == "") {
-      return setError("Please enter your password");
+      return alert("Please enter your password");
     }
     if (!email.includes("@")) {
-      return setError("Email is not valid");
+      return alert("Email is not valid");
     }
     if (email.length < 6) {
-      return setError("Email is too short");
+      return alert("Email is too short");
     }
     if (password.length < 5) {
-      return setError("Password must be 6 characters long");
+      return alert("Password must be 6 characters long");
     }
     if (password != confirmPassword) {
-      return setError("password does not match");
+      return alert("password does not match");
     }
+    try {
+      const register = await user_service.register_customer({ customer_name: name, email_register: email, user_name: user_name, password_register: password, phone: phone });
+      if (register.data.success === true) {
+        alert(register.data.message);
+        navigation.replace("login");
+      } else if (register.data.success === false) {
+        alert(register.data.message);
+      }
+    }
+    catch (error) {
+      console.error(error);
+    }
+
   };
   return (
     <InternetConnectionAlert
@@ -83,7 +94,6 @@ const SignupScreen = ({ navigation }) => {
             </View>
           </View>
           <View style={styles.formContainer}>
-            <CustomAlert message={error} type={"error"} />
             <CustomInput
               value={name}
               setValue={setName}
@@ -92,9 +102,23 @@ const SignupScreen = ({ navigation }) => {
               radius={5}
             />
             <CustomInput
+              value={user_name}
+              setValue={setUserName}
+              placeholder={"User Name"}
+              placeholderTextColor={colors.muted}
+              radius={5}
+            />
+            <CustomInput
               value={email}
               setValue={setEmail}
               placeholder={"Email"}
+              placeholderTextColor={colors.muted}
+              radius={5}
+            />
+            <CustomInput
+              value={phone}
+              setValue={setPhone}
+              placeholder={"Phone"}
               placeholderTextColor={colors.muted}
               radius={5}
             />

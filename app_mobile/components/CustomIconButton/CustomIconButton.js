@@ -1,6 +1,8 @@
 import { StyleSheet, Text, TouchableOpacity, Image } from "react-native";
 import React from "react";
 import colors from "../../colors/Colors";
+import { urlImage } from '../../config';
+
 const CustomIconButton = ({ text, image, onPress, active }) => {
   return (
     <TouchableOpacity
@@ -10,7 +12,7 @@ const CustomIconButton = ({ text, image, onPress, active }) => {
       ]}
       onPress={onPress}
     >
-      <Image source={image} style={styles.buttonIcon} />
+      <Image src={urlImage + "category/" + image} style={styles.buttonIcon} />
       <Text
         style={[
           styles.buttonText,
@@ -34,17 +36,17 @@ const styles = StyleSheet.create({
     backgroundColor: colors.white,
     borderRadius: 10,
     height: 40,
-    width: 110,
+    width: 150,
     elevation: 3,
     margin: 5,
   },
   buttonText: {
-    fontSize: 12,
+    fontSize: 14,
     color: colors.muted,
     fontWeight: "bold",
   },
   buttonIcon: {
-    height: 20,
+    height: 30,
     width: 35,
     resizeMode: "contain",
   },

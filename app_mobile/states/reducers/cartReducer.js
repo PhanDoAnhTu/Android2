@@ -4,15 +4,15 @@ const reducer = (state = [], action) => {
   let done = false;
   switch (action.type) {
     case actions.CART_ADD:
-      console.log(state);
-      console.log(action.payload);
+      // console.log(state);
+      // console.log(action.payload);
       state.map((item, index) => {
-        if (item._id === action.payload.id) {
+        if (item._product_id === action.payload.product_id) {
           done = true;
-          console.log(item);
-          if (item.avaiableQuantity > action.quantity) {
-            state[index].quantity = state[index].quantity + action.quantity;
-            state[index].avaiableQuantity = state[index].avaiableQuantity - action.quantity;
+          // console.log(item);
+          if (item._avaiableQuantity > action.quantity) {
+            state[index]._quantity = state[index]._quantity + action.quantity;
+            state[index]._avaiableQuantity = state[index]._avaiableQuantity - action.quantity;
           } else {
             console.log("...");
           }
@@ -24,28 +24,28 @@ const reducer = (state = [], action) => {
         return [
           ...state,
           {
-            _id: action.payload.id,
-            category: action.payload.category,
-            brand: action.payload.brand,
-            description: action.payload.description,
-            image: action.payload.images[0],
-            price: action.payload.price,
-            title: action.payload.title,
-            rating: action.payload.rating,
-            avaiableQuantity: action.payload.stock,
-            quantity: action.quantity,
+            _product_id: action.payload.product_id,
+            _category_name: action.payload.category_name,
+            _brand_name: action.payload.brand_name,
+            _product_detail: action.payload.product_detail,
+            _image: action.payload.product_image,
+            _price: action.payload.price_in_store,
+            _title: action.payload.product_name,
+            _rating: action.payload.rating_score,
+            _avaiableQuantity: action.payload.store_qty,
+            _quantity: action.quantity,
           },
         ];
       }
 
     case actions.CART_REMOVE:
-      return state.filter((item) => item._id !== action.payload);
+      return state.filter((item) => item._product_id !== action.payload);
 
     case actions.INCREASE_CART_ITEM_QUANTITY:
       if (action.payload.type === "increase") {
         state.map((item, index) => {
-          if (item._id === action.payload.id) {
-            return (state[index].quantity = state[index].quantity + 1);
+          if (item._product_id === action.payload.product_id) {
+            return (state[index]._quantity = state[index]._quantity + 1);
           }
         });
       }
@@ -53,8 +53,8 @@ const reducer = (state = [], action) => {
     case actions.DECREASE_CART_ITEM_QUANTITY:
       if (action.payload.type === "decrease") {
         state.map((item, index) => {
-          if (item._id === action.payload.id) {
-            return (state[index].quantity = state[index].quantity - 1);
+          if (item._product_id === action.payload.product_id) {
+            return (state[index]._quantity = state[index]._quantity - 1);
           }
         });
       }

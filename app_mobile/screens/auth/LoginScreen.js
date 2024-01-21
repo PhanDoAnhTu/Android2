@@ -9,18 +9,45 @@ import {
 } from "react-native";
 
 import React, { useState } from "react";
-import  colors  from "../../colors/Colors";
+import colors from "../../colors/Colors";
 import CustomInput from "../../components/CustomInput/CustomInput";
 import header_logo from "../../assets/logo/AnhTuSHop.png";
 import CustomButton from "../../components/CustomButton/CustomButton";
 import InternetConnectionAlert from "react-native-internet-connection-alert";
-
+import user_service from "../../services/frontend/user_service";
+import AsyncStorage from "@react-native-async-storage/async-storage";
 const LoginScreen = ({ navigation }) => {
   const [email, setEmail] = useState("");
   const [password, setPassword] = useState("");
 
-  const loginHandle = () => {
-    navigation.replace("tab", { user: [{ "name": "AnhTu" }] });
+  _storeData = async (user) => {
+    try {
+      await AsyncStorage.setItem("authUser", JSON.stringify(user));
+    } catch (error) {
+      console.error(error);
+    }
+  };
+
+  const loginHandle = async () => {
+    if (email === "" || password === "") {
+      alert("Xin hãy điền đầy đủ thông tin !");
+    } else {
+      try {
+        const login_customer = await user_service.login_customer({ email_login: email, password_login: password });
+        if (login_customer.data.kiemtra === "not_email") {
+          alert(login_customer.data.message);
+        } else if (login_customer.data.kiemtra === "err_password") {
+          alert(login_customer.data.message);
+          setPassword('');
+        } else if (login_customer.data.kiemtra === true) {
+         await _storeData(login_customer.data.customer);
+          navigation.replace("tab", { user: login_customer.data.customer });
+        }
+      }
+      catch (error) {
+        console.error(error);
+      }
+    }
   };
 
   return (
@@ -64,7 +91,7 @@ const LoginScreen = ({ navigation }) => {
           </View>
         </ScrollView>
         <View style={styles.buttomContainer}>
-          <CustomButton text={"Login"} onPress={loginHandle} />
+          <CustomButton text={"Login"} onPress={() => loginHandle()} />
         </View>
         <View style={styles.bottomContainer}>
           <Text>Don't have an account?</Text>
@@ -76,6 +103,7 @@ const LoginScreen = ({ navigation }) => {
           </Text>
         </View>
       </KeyboardAvoidingView>
+
     </InternetConnectionAlert>
   );
 };

@@ -12,32 +12,50 @@ import React, { useState, useEffect } from "react";
 import { Ionicons, FontAwesome5 } from "@expo/vector-icons";
 import colors from "../../colors/Colors";
 import CustomIconButton from "../../components/CustomIconButton/CustomIconButton";
+import category_service from "../../services/frontend/category_service";
+import store_products_service from "../../services/frontend/store_products_service";
 
 const CategoriesScreen = ({ navigation, route }) => {
   const { categoryID } = route.params;
-
-
-  const category = [
-    {
-      _id: "1",
-      title: "SmartPhone",
-      image: require("../../assets/icons/smartphone_66.png"),
-    },
-    {
-      _id: "2",
-      title: "Laptop",
-      image: require("../../assets/icons/laptop_66.png"),
-    }
-  ];
+  const [category, setCategory] = useState([]);
   const [selectedTab, setSelectedTab] = useState(category[0]);
+  const [NewProducts, setNewProducts] = useState([]);
 
+  const [product_cat, set_product_cat] = useState([]);
+  function fetchCategory() {
+    (async function () {
+      try {
+        const cat_data = await category_service.get_CategoryByParentId(0);
+        // const products_data = await store_products_service.getNewProductAll(8, 1);
+        // setNewProducts(products_data.data.new_products_all);
+        // const products_cat = await store_products_service.getProductByCategory(8, 1, selectedTab.id);
+        // console.log(products_cat);
+        if (cat_data.data.success === true) {
+          setCategory(cat_data.data.categories_data);
+          // console.log("Category:",cat_data.data.categories_data);
+        } else {
+          console.log("error: " + cat_data.data);
+        }
+      } catch (error) {
+        console.error(error);
+      }
+    })();
+  }
 
   navigation.addListener("focus", () => {
     if (categoryID) {
       setSelectedTab(categoryID);
     }
   });
-
+  // console.log(selectedTab.id);
+  
+  useEffect(() => {
+    fetchCategory();
+    // console.log(NewProducts);
+    // const result = NewProducts.filter((pro) => pro.category_id ==selectedTab?.id);
+    // console.log(result);
+    // set_product_cat(result);
+  }, [selectedTab]);
   return (
     <View style={styles.container}>
       <StatusBar></StatusBar>
@@ -76,33 +94,86 @@ const CategoriesScreen = ({ navigation, route }) => {
           renderItem={({ item: tab }) => (
             <CustomIconButton
               key={tab}
-              text={tab.title}
+              text={tab.name}
               image={tab.image}
-              active={selectedTab?.title === tab.title ? true : false}
+              active={selectedTab?.id === tab.id ? true : false}
               onPress={() => {
                 setSelectedTab(tab);
               }}
             />
           )}
         />
-          <View style={styles.noItemContainer}>
-            <View
-              style={{
-                display: "flex",
-                justifyContent: "center",
-                alignItems: "center",
-                backgroundColor: colors.white,
-                height: 150,
-                width: 150,
-                borderRadius: 10,
-              }}
-            >
-              <Text style={styles.emptyBoxText}>
-                There no product in this category
-              </Text>
-            </View>
+        <View style={styles.noItemContainer}>
+          <View
+            style={{
+              display: "flex",
+              justifyContent: "center",
+              alignItems: "center",
+              backgroundColor: colors.white,
+              height: 150,
+              width: 150,
+              borderRadius: 10,
+            }}
+          >
+            <Text style={styles.emptyBoxText}>
+              There no product in this category
+            </Text>
+            {/* {NewProducts.filter(
+              (product) => product?.category_id == selectedTab?.id
+            ).length === 0 ? (
+              <View style={styles.noItemContainer}>
+                <View
+                  style={{
+                    display: "flex",
+                    justifyContent: "center",
+                    alignItems: "center",
+                    backgroundColor: colors.white,
+                    height: 150,
+                    width: 150,
+                    borderRadius: 10,
+                  }}
+                >
+
+                  <Text style={styles.emptyBoxText}>
+                    There no product in this category
+                  </Text>
+                </View>
+              </View>
+            ) : (
+              <FlatList
+                data={foundItems.filter(
+                  (product) => product?.category_id === selectedTab?.id
+                )}
+                refreshControl={
+                  <RefreshControl
+                    refreshing={refeshing}
+                    onRefresh={handleOnRefresh}
+                  />
+                }
+                keyExtractor={(index, item) => `${index}-${item}`}
+                contentContainerStyle={{ margin: 10 }}
+                numColumns={2}
+                renderItem={({ item: product }) => (
+                  <View
+                    style={[
+                      styles.productCartContainer,
+                    ]}
+                  >
+                    <ProductCard
+                      cardSize={"large"}
+                      name={product.product_name}
+                      image={product.image}
+                      price={product.price_in_store}
+                      quantity={product.qty}
+                    />
+                    <View style={styles.emptyView}></View>
+                  </View>
+                )}
+              />
+            )} */}
           </View>
-       
+        </View>
+
       </View>
     </View>
   );

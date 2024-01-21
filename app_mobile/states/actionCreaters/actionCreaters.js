@@ -6,21 +6,21 @@ export const addCartItem = (product, _quantity) => {
   };
 };
 
-export const removeCartItem = (id) => {
+export const removeCartItem = (product_id) => {
   return (dispatch) => {
-    dispatch({ type: actions.CART_REMOVE, payload: id });
+    dispatch({ type: actions.CART_REMOVE, payload: product_id });
   };
 };
 
-export const increaseCartItemQuantity = (id) => {
+export const increaseCartItemQuantity = (product_id) => {
   return (dispatch) => {
-    dispatch({ type: actions.INCREASE_CART_ITEM_QUANTITY, payload: id });
+    dispatch({ type: actions.INCREASE_CART_ITEM_QUANTITY, payload: product_id });
   };
 };
 
-export const decreaseCartItemQuantity = (id) => {
+export const decreaseCartItemQuantity = (product_id) => {
   return (dispatch) => {
-    dispatch({ type: actions.DECREASE_CART_ITEM_QUANTITY, payload: id });
+    dispatch({ type: actions.DECREASE_CART_ITEM_QUANTITY, payload: product_id });
   };
 };
 

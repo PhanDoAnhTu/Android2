@@ -2,6 +2,7 @@ import { StyleSheet, Text, TouchableOpacity, View, Image } from "react-native";
 import React from "react";
 import colors from "../../colors/Colors";
 import { Ionicons } from "@expo/vector-icons";
+import { urlImage } from '../../config';
 
 const ProductCard = ({
   name,
@@ -12,13 +13,19 @@ const ProductCard = ({
   onPressSecondary,
   cardSize,
 }) => {
+  function formatCash(number) {
+    let str = String(number);
+    return str.split('').reverse().reduce((prev, next, index) => {
+      return ((index % 3) ? next : (next + ',')) + prev
+    })
+  }
   return (
     <TouchableOpacity
       style={[styles.container, { width: cardSize === "large" ? "100%" : 150 }]}
       onPress={onPress}
     >
       <View style={styles.imageContainer}>
-        <Image source={{ uri: image }} style={styles.productImage} />
+        <Image src={urlImage + "product/" + image} style={styles.productImage} />
       </View>
       <View style={styles.infoContainer}>
         <View>
@@ -26,13 +33,13 @@ const ProductCard = ({
             0,
             10
           )}..`}</Text>
-          <Text style={styles.primaryTextSm}>{price}Đ</Text>
+          <Text style={styles.primaryTextSm}>{formatCash(price)}Đ</Text>
         </View>
         <View>
           {quantity > 0 ? (
             <TouchableOpacity
               style={styles.iconContainer}
-    
+
             >
               <Ionicons name="cart" size={20} color="white" />
             </TouchableOpacity>
@@ -93,10 +100,10 @@ const styles = StyleSheet.create({
   primaryTextSm: {
     fontSize: 15,
     fontWeight: "bold",
-    color: colors.primary,
+    color: colors.secondary,
   },
   iconContainer: {
-    backgroundColor: colors.primary,
+    backgroundColor: colors.secondary,
     width: 30,
     height: 30,
     borderRadius: 5,

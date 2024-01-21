@@ -9,29 +9,18 @@ import {
   RefreshControl,
   ScrollView,
 } from "react-native";
-import { Ionicons,FontAwesome5 } from "@expo/vector-icons";
+import { Ionicons, FontAwesome5 } from "@expo/vector-icons";
 import React, { useEffect, useState } from "react";
 import Search from "../../assets/icons/loupe.png";
-import  colors  from "../../colors/Colors";
+import colors from "../../colors/Colors";
 import CustomIconButton from "../../components/CustomIconButton/CustomIconButton";
 import ProductCard from "../../components/ProductCard/ProductCard";
 import { useSelector, useDispatch } from "react-redux";
 import SearchableDropdown from "react-native-searchable-dropdown";
 import { SliderBox } from "react-native-image-slider-box";
+import store_products_service from "../../services/frontend/store_products_service";
+import category_service from "../../services/frontend/category_service";
 
-const category = [
-  {
-    _id: "1",
-    title: "SmartPhone",
-    image: require("../../assets/icons/smartphone_66.png"),
-  },
-  {
-    _id: "2",
-    title: "Laptop",
-    image: require("../../assets/icons/laptop_66.png"),
-  },
-
-];
 
 const slides = [
   require("../../assets/image/banners/banner2.png"),
@@ -40,41 +29,62 @@ const slides = [
 
 const HomeScreen = ({ navigation, route }) => {
   const cartproduct = useSelector((state) => state.product);
+  // const { user } = route.params;
 
-  const [products, setProducts] = useState([]);
+  // console.log(route.params);
+
   const [refeshing, setRefreshing] = useState(false);
   const [searchItems, setSearchItems] = useState([]);
+  const [Category_parent, setCategory_parents] = useState([]);
+  const [NewProducts, setNewProducts] = useState([]);
+
+  function fetchCategory() {
+    (async function () {
+      try {
+        const cat_data = await category_service.get_CategoryByParentId(0);
+        if (cat_data.data.success === true) {
+          setCategory_parents(cat_data.data.categories_data);
+          // console.log("Category:",cat_data.data.categories_data);
+        } else {
+          console.log("error: " + cat_data.data);
+        }
+      } catch (error) {
+        console.error(error);
+      }
+
+    })();
+  }
 
 
+  function fetchProduct() {
+    (async function () {
+      try {
+        const products_data = await store_products_service.getNewProductAll(8, 1);
+        if (products_data.data.success === true) {
+          setNewProducts(products_data.data.new_products_all);
+          searchable();
+          // console.log("products: "+JSON.stringify(products_data.data.new_products_all));
+        } else {
+          console.log("error: " + products_data.data);
+        }
+      } catch (error) {
+        console.error(error);
+      }
+    })();
+  }
+  const searchable = () => {
+    if (NewProducts.length > 0) {
+      let payload = [];
+      NewProducts.forEach((pro, index) => {
+        let searchableItem = { ...pro, product_id: ++index, name: pro.product_name };
+        payload.push(searchableItem);
+      });
+      setSearchItems(payload);
+    }
+  }
 
   const handleProductPress = (product) => {
     navigation.navigate("productdetail", { product: product });
-  };
-
-  var headerOptions = {
-    method: "GET",
-    redirect: "follow",
-  };
-
-  const fetchProduct = () => {
-    fetch(`https://dummyjson.com/products`, headerOptions)
-      .then((response) => response.json())
-      .then((result) => {
-        if (result.limit > 0) {
-          setProducts(result.products);
-
-          let payload = [];
-          result.products.forEach((cat, index) => {
-            let searchableItem = { ...cat, id: ++index, name: cat.title };
-            payload.push(searchableItem);
-          });
-          setSearchItems(payload);
-        } else {
-        }
-      })
-      .catch((error) => {
-        console.log("error", error);
-      });
   };
 
   const handleOnRefresh = () => {
@@ -84,8 +94,11 @@ const HomeScreen = ({ navigation, route }) => {
   };
 
   useEffect(() => {
+    fetchCategory();
+    searchable();
     fetchProduct();
-  }, []);
+    // console.log(searchItems);
+  }, [NewProducts]);
 
   return (
     <View style={styles.container}>
@@ -108,14 +121,14 @@ const HomeScreen = ({ navigation, route }) => {
           ) : (
             <></>
           )}
-         <FontAwesome5 name="shopping-cart" size={24} color={colors.muted} />
+          <FontAwesome5 name="shopping-cart" size={24} color={colors.muted} />
         </TouchableOpacity>
       </View>
       <View style={styles.bodyContainer}>
         <View style={styles.searchContainer}>
           <View style={styles.inputContainer}>
             <SearchableDropdown
-              // onTextChange={(item) => console.log(item)}
+              onTextChange={(item) => console.log(item)}
               onItemSelect={(item) => handleProductPress(item)}
               defaultIndex={0}
               containerStyle={{
@@ -180,13 +193,13 @@ const HomeScreen = ({ navigation, route }) => {
               showsHorizontalScrollIndicator={false}
               style={styles.flatListContainer}
               horizontal={true}
-              data={category}
+              data={Category_parent}
               keyExtractor={(item, index) => `${item}-${index}`}
               renderItem={({ item, index }) => (
                 <View style={{ marginBottom: 10 }} key={index}>
                   <CustomIconButton
                     key={index}
-                    text={item.title}
+                    text={item.name}
                     image={item.image}
                     onPress={() =>
                       navigation.jumpTo("categories", { categoryID: item })
@@ -197,10 +210,11 @@ const HomeScreen = ({ navigation, route }) => {
             />
             <View style={styles.emptyView}></View>
           </View>
+
           <View style={styles.primaryTextContainer}>
             <Text style={styles.primaryText}>New Products</Text>
           </View>
-          {products.length === 0 ? (
+          {NewProducts.length === 0 ? (
             <View style={styles.productCardContainerEmpty}>
               <Text style={styles.productCardContainerEmptyText}>
                 No Product
@@ -218,18 +232,18 @@ const HomeScreen = ({ navigation, route }) => {
                 showsHorizontalScrollIndicator={false}
                 initialNumToRender={5}
                 horizontal={true}
-                data={products.slice(0, 8)}
-                keyExtractor={(item) => item._id}
+                data={NewProducts.slice(0, 8)}
+                keyExtractor={(item) => item.product_id}
                 renderItem={({ item, index }) => (
                   <View
-                    key={item._id}
+                    key={item.product_id}
                     style={{ marginLeft: 5, marginBottom: 10, marginRight: 5 }}
                   >
                     <ProductCard
-                      name={item.title}
-                      image={item.images[0]}
-                      price={item.price}
-                      quantity={item.quantity}
+                      name={item.product_name}
+                      image={item.product_image}
+                      price={item.price_in_store}
+                      quantity={item.store_qty}
                       onPress={() => handleProductPress(item)}
                     />
                   </View>
@@ -277,7 +291,6 @@ const styles = StyleSheet.create({
   bodyContainer: {
     width: "100%",
     flexDirecion: "row",
-
     paddingBottom: 0,
     flex: 1,
   },

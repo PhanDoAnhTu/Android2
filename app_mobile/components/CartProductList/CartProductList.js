@@ -5,6 +5,7 @@ import colors from "../../colors/Colors";
 import Swipeable from "react-native-gesture-handler/Swipeable";
 import { GestureHandlerRootView } from "react-native-gesture-handler";
 import { MaterialCommunityIcons } from "@expo/vector-icons";
+import { urlImage } from '../../config';
 
 const CartProductList = ({
   image,
@@ -34,7 +35,7 @@ const CartProductList = ({
         <Swipeable renderRightActions={rightSwipe}>
           <View style={styles.container}>
             <View style={styles.imageContainer}>
-              <Image source={{ uri: image }} style={styles.productImage} />
+              <Image src={urlImage+"product/"+image} style={styles.productImage} />
             </View>
             <View style={styles.productInfoContainer}>
               <Text style={styles.productTitle}>{title}</Text>
@@ -117,7 +118,7 @@ const styles = StyleSheet.create({
   },
   productPrice: {
     fontSize: 15,
-    color: colors.primary,
+    color: colors.secondary,
   },
   deleteButtonContainer: {
     flexDirection: "row",
@@ -139,7 +140,6 @@ const styles = StyleSheet.create({
   counter: {
     backgroundColor: colors.white,
     width: 150,
-    marginLeft: 20,
     padding: 5,
     borderRadius: 5,
     borderBottomRightRadius: 10,

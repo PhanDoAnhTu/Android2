@@ -7,12 +7,13 @@ import {
   Text,
 } from "react-native";
 import React, { useState, useEffect } from "react";
-import { Ionicons ,FontAwesome5} from "@expo/vector-icons";
-import  colors from "../../colors/Colors";
+import { Ionicons, FontAwesome5 } from "@expo/vector-icons";
+import colors from "../../colors/Colors";
 import CustomButton from "../../components/CustomButton/CustomButton";
 import { useSelector, useDispatch } from "react-redux";
 import { bindActionCreators } from "redux";
 import * as actionCreaters from "../../states/actionCreaters/actionCreaters";
+import { urlImage } from '../../config';
 
 const ProductDetailScreen = ({ navigation, route }) => {
   const { product } = route.params;
@@ -22,12 +23,14 @@ const ProductDetailScreen = ({ navigation, route }) => {
   const { addCartItem } = bindActionCreators(actionCreaters, dispatch);
 
   const [avaiableQuantity, setAvaiableQuantity] = useState(0);
-  const [quantity, setQuantity] = useState(0);
-  const [productImage, SetProductImage] = useState(" ");
+  const [quantity, setQuantity] = useState(1);
+  const [productImage, SetProductImage] = useState("");
 
   const handleIncreaseButton = (quantity) => {
     if (avaiableQuantity > quantity) {
       setQuantity(quantity + 1);
+    }else{
+      alert("out of quantity");
     }
   };
 
@@ -40,19 +43,18 @@ const ProductDetailScreen = ({ navigation, route }) => {
 
 
   useEffect(() => {
-    setAvaiableQuantity(product.stock);
-    SetProductImage(product.images[0]);
-
+    setAvaiableQuantity(product?.store_qty);
+    SetProductImage(product?.product_image);
   }, []);
 
- 
-  const handleAddToCat = (item,quantity) => {
-    if(quantity > 0) {
+
+  const handleAddToCat = (item, quantity) => {
+    if (quantity > 0) {
       addCartItem(item, quantity);
-    }else{
+    } else {
       alert("Quantity must be greater than zero!");
     }
-   
+
     // console.log(item);
   };
 
@@ -72,8 +74,6 @@ const ProductDetailScreen = ({ navigation, route }) => {
             color={colors.muted}
           />
         </TouchableOpacity>
-
-        <View></View>
         <TouchableOpacity
           style={styles.cartIconContainer}
           onPress={() => navigation.navigate("cart")}
@@ -90,12 +90,12 @@ const ProductDetailScreen = ({ navigation, route }) => {
       </View>
       <View style={styles.bodyContainer}>
         <View style={styles.productImageContainer}>
-          <Image source={{ uri: productImage }} style={styles.productImage} />
+          <Image src={urlImage + "product/" + productImage} style={styles.productImage} />
         </View>
         <View style={styles.productInfoContainer}>
           <View style={styles.productInfoTopContainer}>
             <View style={styles.productNameContaier}>
-              <Text style={styles.productNameText}>{product?.title}</Text>
+              <Text style={styles.productNameText}>{product?.product_name}</Text>
             </View>
             <View style={styles.infoButtonContainer}>
             </View>
@@ -104,12 +104,12 @@ const ProductDetailScreen = ({ navigation, route }) => {
               </View>
               <View style={styles.productPriceContainer}>
                 <Text style={styles.secondaryTextSm}>Price:</Text>
-                <Text style={styles.primaryTextSm}>{product?.price} Đ</Text>
+                <Text style={styles.primaryTextSm}>{product?.price_in_store} Đ</Text>
               </View>
             </View>
             <View style={styles.productDescriptionContainer}>
               <Text style={styles.secondaryTextSm}>Description:</Text>
-              <Text>{product?.description}</Text>
+              <Text>{product?.product_detail}</Text>
             </View>
           </View>
           <View style={styles.productInfoBottomContainer}>
@@ -139,7 +139,7 @@ const ProductDetailScreen = ({ navigation, route }) => {
                 <CustomButton
                   text={"Add to Cart"}
                   onPress={() => {
-                    handleAddToCat(product,quantity);
+                    handleAddToCat(product, quantity);
                   }}
                 />
               ) : (
@@ -183,6 +183,7 @@ const styles = StyleSheet.create({
     alignItems: "center",
     justifyContent: "flex-start",
     flex: 1,
+
   },
   productImageContainer: {
     width: "100%",

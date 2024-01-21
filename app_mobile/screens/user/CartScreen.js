@@ -8,8 +8,8 @@ import {
   ScrollView,
 } from "react-native";
 import React, { useEffect, useState } from "react";
-import { Ionicons ,FontAwesome5} from "@expo/vector-icons";
-import  colors from "../../colors/Colors";
+import { Ionicons, FontAwesome5 } from "@expo/vector-icons";
+import colors from "../../colors/Colors";
 import CartProductList from "../../components/CartProductList/CartProductList";
 import CustomButton from "../../components/CustomButton/CustomButton";
 import { useSelector, useDispatch } from "react-redux";
@@ -21,7 +21,7 @@ const CartScreen = ({ navigation }) => {
   const [totalPrice, setTotalPrice] = useState(0);
   const [refresh, setRefresh] = useState(false);
   const dispatch = useDispatch();
-
+  // console.log(cartproduct);
   const { removeCartItem, increaseCartItemQuantity, decreaseCartItemQuantity } =
     bindActionCreators(actionCreaters, dispatch);
 
@@ -32,14 +32,14 @@ const CartScreen = ({ navigation }) => {
 
   const increaseQuantity = (id, quantity, avaiableQuantity) => {
     if (avaiableQuantity > quantity) {
-      increaseCartItemQuantity({ id: id, type: "increase" });
+      increaseCartItemQuantity({ product_id: id, type: "increase" });
       setRefresh(!refresh);
     }
   };
 
   const decreaseQuantity = (id, quantity) => {
     if (quantity > 1) {
-      decreaseCartItemQuantity({ id: id, type: "decrease" });
+      decreaseCartItemQuantity({ product_id: id, type: "decrease" });
       setRefresh(!refresh);
     }
   };
@@ -47,7 +47,7 @@ const CartScreen = ({ navigation }) => {
   useEffect(() => {
     setTotalPrice(
       cartproduct.reduce((accumulator, object) => {
-        return accumulator + object.price * object.quantity;
+        return accumulator + object._price * object._quantity;
       }, 0)
     );
   }, [cartproduct, refresh]);
@@ -76,7 +76,7 @@ const CartScreen = ({ navigation }) => {
 
         <View></View>
         <TouchableOpacity>
-        <FontAwesome5 name="shopping-cart" size={24} color={colors.secondary} />
+          <FontAwesome5 name="shopping-cart" size={24} color={colors.secondary} />
         </TouchableOpacity>
       </View>
       {cartproduct.length === 0 ? (
@@ -90,23 +90,23 @@ const CartScreen = ({ navigation }) => {
             <CartProductList
               key={index}
               index={index}
-              image={item.image}
-              title={item.title}
-              price={item.price}
-              quantity={item.quantity}
+              image={item._image}
+              title={item._title}
+              price={item._price}
+              quantity={item._quantity}
               onPressIncrement={() => {
                 increaseQuantity(
-                  item._id,
-                  item.quantity,
-                  item.avaiableQuantity
+                  item._product_id,
+                  item._quantity,
+                  item._avaiableQuantity
                 );
               }}
               onPressDecrement={() => {
-                decreaseQuantity(item._id, item.quantity);
+                decreaseQuantity(item._product_id, item._quantity);
               }}
               handleDelete={() => {
-                console.log(item._id);
-                deleteItem(item._id);
+                // console.log(item._product_id);
+                deleteItem(item._product_id);
               }}
             />
           ))}
@@ -125,6 +125,7 @@ const CartScreen = ({ navigation }) => {
           {cartproduct.length > 0 ? (
             <CustomButton
               text={"Checkout"}
+              onPress={() => navigation.navigate("checkout")}
             />
           ) : (
             <CustomButton
