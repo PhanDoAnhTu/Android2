@@ -62,7 +62,12 @@ const HomeScreen = ({ navigation, route }) => {
         const products_data = await store_products_service.getNewProductAll(8, 1);
         if (products_data.data.success === true) {
           setNewProducts(products_data.data.new_products_all);
-          searchable();
+          let payload = [];
+          products_data.data.new_products_all.forEach((pro, index) => {
+            let searchableItem = { ...pro, id: index++, name: pro.product_name };
+            payload.push(searchableItem);
+          });
+          setSearchItems(payload);
           // console.log("products: "+JSON.stringify(products_data.data.new_products_all));
         } else {
           console.log("error: " + products_data.data);
@@ -72,16 +77,7 @@ const HomeScreen = ({ navigation, route }) => {
       }
     })();
   }
-  const searchable = () => {
-    if (NewProducts.length > 0) {
-      let payload = [];
-      NewProducts.forEach((pro, index) => {
-        let searchableItem = { ...pro, product_id: ++index, name: pro.product_name };
-        payload.push(searchableItem);
-      });
-      setSearchItems(payload);
-    }
-  }
+
 
   const handleProductPress = (product) => {
     navigation.navigate("productdetail", { product: product });
@@ -95,10 +91,8 @@ const HomeScreen = ({ navigation, route }) => {
 
   useEffect(() => {
     fetchCategory();
-    searchable();
     fetchProduct();
-    // console.log(searchItems);
-  }, [NewProducts]);
+  }, []);
 
   return (
     <View style={styles.container}>
@@ -226,7 +220,7 @@ const HomeScreen = ({ navigation, route }) => {
                 refreshControl={
                   <RefreshControl
                     refreshing={refeshing}
-                    onRefresh={handleOnRefresh}
+                    onRefresh={() => handleOnRefresh()}
                   />
                 }
                 showsHorizontalScrollIndicator={false}

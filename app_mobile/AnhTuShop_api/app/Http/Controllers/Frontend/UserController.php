@@ -14,7 +14,7 @@ class UserController extends Controller
 
     public function register_customer(Request $request)
     {
-        $check_email = DB::table('user')->where([['email', '=', $request->email],["roles", '=',"customer"]]);
+        $check_email = DB::table('user')->where([['email', '=', $request->email]]);
 
         if ($check_email->count() > 0) {
             return response()->json(
@@ -48,18 +48,28 @@ class UserController extends Controller
                 200
             );
         } else {
-            $check_customer = DB::table("user")->where([['email', '=', $request->email_login], ['password', '=', $request->password_login],["roles",'=',"customer"]]);
-            if ($check_customer->count() == 0) {
+            $check = DB::table("user")->where([['email', '=', $request->email_login], ['password', '=', $request->password_login]]);
+            if ($check->count() == 0) {
                 return response()->json(
                     ['kiemtra' => "err_password", 'message' => 'Mật khẩu không chính xác !'],
                     200
                 );
 
             } else {
-                return response()->json(
-                    ['kiemtra' => true, 'message' => 'Đăng nhập thành công !', "customer" => $check_customer->first()],
-                    200
-                );
+                $check_admin = DB::table("user")->where([['email', '=', $request->email_login], ['password', '=', $request->password_login], ["roles", '=', "admin"]]);
+                $check_customer = DB::table("user")->where([['email', '=', $request->email_login], ['password', '=', $request->password_login], ["roles", '=', "customer"]]);
+                if ($check_customer->count() > 0) {
+                    return response()->json(
+                        ['kiemtra' => true, "role" => "customer", 'message' => 'Đăng nhập thành công !', "customer" => $check_customer->first()],
+                        200
+                    );
+                }
+                if ($check_admin->count() > 0) {
+                    return response()->json(
+                        ['kiemtra' => true, "role" => "admin", 'message' => 'Đăng nhập thành công !', "admin" => $check_admin->first()],
+                        200
+                    );
+                }
 
             }
         }
@@ -100,11 +110,11 @@ class UserController extends Controller
 
     }
 
-  
+
     public function get_CustomerById($id)
     {
-        
-        $user= DB::table("user")->where([['status', '=', 1], ['roles', '=', "customer"]])->first();
+
+        $user = DB::table("user")->where([['status', '=', 1], ['roles', '=', "customer"]])->first();
 
         return response()->json(
 
@@ -115,7 +125,7 @@ class UserController extends Controller
         );
     }
 
-  
-  
+
+
 
 }

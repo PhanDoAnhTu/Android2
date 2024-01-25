@@ -1,7 +1,7 @@
 import { StyleSheet, Image, TouchableOpacity } from "react-native";
 import React from "react";
 import { createBottomTabNavigator } from "@react-navigation/bottom-tabs";
-import { Ionicons, FontAwesome, AntDesign } from "@expo/vector-icons";
+import { FontAwesome, AntDesign } from "@expo/vector-icons";
 import HomeScreen from "../../screens/user/HomeScreen";
 import colors from "../../colors/Colors";
 import CategoriesScreen from "../../screens/user/CategoriesScreen";
@@ -44,17 +44,11 @@ const Tabs = ({ navigation, route }) => {
             return (
               <TouchableOpacity disabled>
                 {focused == true ? (
-                  <Ionicons
-                    name="ios-apps-sharp"
-                    size={30}
-                    color={colors.secondary}
-                  />
+                  <AntDesign name="appstore-o" size={30} color={colors.secondary} />
+
                 ) : (
-                  <Ionicons
-                    name="ios-apps-sharp"
-                    size={30}
-                    color={colors.muted}
-                  />
+                  <AntDesign name="appstore-o" size={30} color={colors.muted} />
+
                 )}
               </TouchableOpacity>
             );
@@ -76,7 +70,7 @@ const Tabs = ({ navigation, route }) => {
                   />)}
               </TouchableOpacity>
             );
-          } 
+          }
         },
         tabBarStyle: {
           borderTopLeftRadius: 20,

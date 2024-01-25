@@ -722,7 +722,7 @@ class StoreProductsController extends Controller
             $store_products = DB::table('store_products')
                 ->join("product", 'store_products.product_id', '=', 'product.id')
                 ->where('store_products.status', 1)
-                ->select('product_id', 'product.name as product_name', 'product.slug as product_slug', 'product.image as product_image', 'product.price as listed_price', "store_products.price as price_in_store", 'product.category_id', 'product.brand_id', 'product.short_description as product_short_description', 'product.detail as product_detail', 'store_products.qty as store_qty', 'store_products.qty_sold as qty_sold_store_products', 'store_products.price as listed_price', 'store_products.status as store_status', 'store_products.created_at as store_created_date');
+                ->select('product_id', 'product.name as product_name', 'product.slug as product_slug', 'product.image as product_image', 'product.price as listed_price', "store_products.price as price_in_store", 'product.category_id', 'product.brand_id', 'product.short_description as product_short_description', 'product.detail as product_detail', 'store_products.qty as store_qty', 'store_products.qty_sold as qty_sold_store_products', 'store_products.status as store_status', 'store_products.created_at as store_created_date');
 
             $store_sale_products = DB::table('sale_products')
                 ->rightJoinSub($store_products, 'products', function (JoinClause $join) {
@@ -832,12 +832,6 @@ class StoreProductsController extends Controller
 
             );
         }
-        return response()->json(
-
-            ['success' => false, 'message' => "tai du lieu khong thanh cong"],
-            200
-
-        );
 
     }
 

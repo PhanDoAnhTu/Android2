@@ -11,10 +11,12 @@ import { Ionicons } from "@expo/vector-icons";
 import OptionList from "../../components/OptionList/OptionList";
 import colors from "../../colors/Colors";
 import AsyncStorage from "@react-native-async-storage/async-storage";
+import { useSelector } from "react-redux";
 
 const UserProfileScreen = ({ navigation, route }) => {
   const [userInfo, setUserInfo] = useState({});
   const { user } = route.params;
+  const cartproduct = useSelector((state) => state.product);
 
   const convertToJSON = (obj) => {
     try {
@@ -23,7 +25,25 @@ const UserProfileScreen = ({ navigation, route }) => {
       setUserInfo(obj);
     }
   };
+  // _CartData = async (user, cart) => {
+  //   try {
+  //     await AsyncStorage.setItem("cartData", JSON.stringify({ _user: user, _cart: cart }));
+  //   } catch (error) {
+  //     console.error(error);
+  //   }
+  // };
+  const logout = async (user, cart) => {
+    if (cartproduct.length > 0) {
+      // await _CartData(user, cart);
+      await AsyncStorage.removeItem("authUser");
+      navigation.replace("login");
+    } else {
+      await AsyncStorage.removeItem("authUser");
+      navigation.replace("login");
+    }
 
+
+  }
   useEffect(() => {
     convertToJSON(user);
   }, []);
@@ -42,22 +62,19 @@ const UserProfileScreen = ({ navigation, route }) => {
 
       </View>
       <View style={styles.OptionsContainer}>
-      <OptionList
+        <OptionList
           text={"Order"}
           Icon={Ionicons}
           iconName={"cart-outline"}
           onPress={async () => {
-            navigation.navigate("order",{user:user});
+            navigation.navigate("order", { user: user });
           }}
         />
         <OptionList
           text={"Logout"}
           Icon={Ionicons}
           iconName={"log-out"}
-          onPress={async () => {
-            await AsyncStorage.removeItem("authUser");
-            navigation.replace("login");
-          }}
+          onPress={() => logout(user, cartproduct)}
         />
       </View>
     </View>

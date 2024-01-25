@@ -77,7 +77,7 @@ const OrderList = ({ item, orders_detail, order_total, onPress }) => {
         </View>
       )}
       <View style={styles.innerRow}>
-        <Text style={styles.secondaryText}>Quantity : {quantity}</Text>
+        {/* <Text style={styles.secondaryText}>Quantity : {quantity}</Text> */}
         {order_total != null && order_total.map((o_t) => {
           if (o_t.order_id === item.id) {
             return (

@@ -23,25 +23,38 @@ const LoginScreen = ({ navigation }) => {
   _storeData = async (user) => {
     try {
       await AsyncStorage.setItem("authUser", JSON.stringify(user));
+      // const cart_data = await AsyncStorage.getItem("cartData");
+      // console.log("cart_data_login: ",cart_data);
     } catch (error) {
       console.error(error);
     }
   };
+  _AdminData = async (user) => {
+    try {
+      await AsyncStorage.setItem("authAdmin", JSON.stringify(user));
+    } catch (error) {
+      console.error(error);
+    }
+  };
+
 
   const loginHandle = async () => {
     if (email === "" || password === "") {
       alert("Xin hãy điền đầy đủ thông tin !");
     } else {
       try {
-        const login_customer = await user_service.login_customer({ email_login: email, password_login: password });
-        if (login_customer.data.kiemtra === "not_email") {
-          alert(login_customer.data.message);
-        } else if (login_customer.data.kiemtra === "err_password") {
-          alert(login_customer.data.message);
+        const login_data = await user_service.login_customer({ email_login: email, password_login: password });
+        if (login_data.data.kiemtra === "not_email") {
+          alert(login_data.data.message);
+        } else if (login_data.data.kiemtra === "err_password") {
+          alert(login_data.data.message);
           setPassword('');
-        } else if (login_customer.data.kiemtra === true) {
-         await _storeData(login_customer.data.customer);
-          navigation.replace("tab", { user: login_customer.data.customer });
+        } else if (login_data.data.kiemtra === true && login_data.data.role === 'customer') {
+          await _storeData(login_data.data.customer);
+          navigation.replace("tab", { user: login_data.data.customer });
+        } else if (login_data.data.kiemtra === true && login_data.data.role === 'admin') {
+         await _AdminData(login_data.data.admin);
+         navigation.replace("dashboard", { admin: login_data.data.admin});
         }
       }
       catch (error) {
@@ -84,6 +97,7 @@ const LoginScreen = ({ navigation }) => {
             <View style={styles.forgetPasswordContainer}>
               <Text
                 style={styles.ForgetText}
+                onPress={() =>navigation.navigate("forgotpassword")}
               >
                 Forget Password?
               </Text>

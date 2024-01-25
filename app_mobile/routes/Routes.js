@@ -10,6 +10,18 @@ import CheckoutScreen from '../screens/user/CheckoutScreen';
 
 import OrderConfirmScreen from '../screens/user/OrderConfirmScreen';
 import OrderScreen from '../screens/user/OrderScreen';
+import OrderDetailScreen from '../screens/user/OrderDetailScreen';
+import DashboardScreen from '../screens/admin/DashboardScreen';
+import AddProductScreen from '../screens/admin/AddProductScreen';
+ import ViewProductScreen from '../screens/admin/ViewProductScreen';
+import ViewCategoryScreen from '../screens/admin/ViewCategoryScreen';
+import ViewUsersScreen from '../screens/admin/ViewUsersScreen';
+import ViewOrdersScreen from '../screens/admin/ViewOrdersScreen';
+import ViewOrderDetailScreen from '../screens/admin/ViewOrderDetailScreen';
+import AddCategoryScreen from '../screens/admin/AddCategoryScreen';
+import ImportProductScreen from '../screens/admin/ImportProduct';
+import ViewStoreProductScreen from '../screens/admin/ViewStoreProductScreen';
+import ForgotPassword from '../screens/auth/ForgotPassword';
 const Stack = createNativeStackNavigator();
 
 const Routes = () => {
@@ -28,6 +40,19 @@ const Routes = () => {
         <Stack.Screen name="checkout" component={CheckoutScreen} />
         <Stack.Screen name="order" component={OrderScreen} />
         <Stack.Screen name="orderconfirm" component={OrderConfirmScreen} />
+        <Stack.Screen name="orderdetail" component={OrderDetailScreen} />
+        <Stack.Screen name="forgotpassword" component={ForgotPassword} />
+
+        <Stack.Screen name="dashboard" component={DashboardScreen} />
+         <Stack.Screen name="addproduct" component={AddProductScreen} />
+        <Stack.Screen name="viewproduct" component={ViewProductScreen} />
+        <Stack.Screen name="viewcategories" component={ViewCategoryScreen} />
+        <Stack.Screen name="viewusers" component={ViewUsersScreen} /> 
+        <Stack.Screen name="vieworder" component={ViewOrdersScreen} />
+        <Stack.Screen name="vieworderdetails" component={ViewOrderDetailScreen} />
+        <Stack.Screen name="addcategories" component={AddCategoryScreen} />
+        <Stack.Screen name="importproduct" component={ImportProductScreen} />
+        <Stack.Screen name="viewstoreproduct" component={ViewStoreProductScreen} />
 
       </Stack.Navigator>
     </NavigationContainer>

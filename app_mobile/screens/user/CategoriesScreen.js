@@ -7,11 +7,14 @@ import {
   Text,
   FlatList,
   RefreshControl,
+  Dimensions
 } from "react-native";
 import React, { useState, useEffect } from "react";
 import { Ionicons, FontAwesome5 } from "@expo/vector-icons";
 import colors from "../../colors/Colors";
 import CustomIconButton from "../../components/CustomIconButton/CustomIconButton";
+import ProductCard from "../../components/ProductCard/ProductCard";
+
 import category_service from "../../services/frontend/category_service";
 import store_products_service from "../../services/frontend/store_products_service";
 
@@ -19,42 +22,54 @@ const CategoriesScreen = ({ navigation, route }) => {
   const { categoryID } = route.params;
   const [category, setCategory] = useState([]);
   const [selectedTab, setSelectedTab] = useState(category[0]);
-  const [NewProducts, setNewProducts] = useState([]);
-
-  const [product_cat, set_product_cat] = useState([]);
-  function fetchCategory() {
-    (async function () {
-      try {
-        const cat_data = await category_service.get_CategoryByParentId(0);
-        // const products_data = await store_products_service.getNewProductAll(8, 1);
-        // setNewProducts(products_data.data.new_products_all);
-        // const products_cat = await store_products_service.getProductByCategory(8, 1, selectedTab.id);
-        // console.log(products_cat);
-        if (cat_data.data.success === true) {
-          setCategory(cat_data.data.categories_data);
-          // console.log("Category:",cat_data.data.categories_data);
-        } else {
-          console.log("error: " + cat_data.data);
-        }
-      } catch (error) {
-        console.error(error);
-      }
-    })();
-  }
-
+  const [refeshing, setRefreshing] = useState(false);
+  const [products_cat, set_products_cat] = useState([]);
   navigation.addListener("focus", () => {
     if (categoryID) {
       setSelectedTab(categoryID);
     }
   });
-  // console.log(selectedTab.id);
-  
+  const [windowWidth, setWindowWidth] = useState(
+    Dimensions.get("window").width
+  );
+  const handleOnRefresh = () => {
+    setRefreshing(true);
+    fetchCategory();
+    setRefreshing(false);
+  };
+  function fetchCategory() {
+    (async function () {
+      try {
+        const cat_data = await category_service.get_CategoryByParentId(0).then(async (result) => {
+          if (result.data.success === true) {
+            setCategory(result.data.categories_data);
+            // console.log("Category:",cat_data.data.categories_data);
+
+            // console.log("selectedTab:", selectedTab);
+            const product_cat = await store_products_service.getProductByCategory(8, 1, selectedTab.id);
+            set_products_cat(product_cat.data.ProductsByCategory);
+
+          } else {
+            console.log("error: " + cat_data.data);
+          }
+        });
+
+
+      } catch (error) {
+        console.error(error);
+      } finally {
+        console.log("productByCat: ", products_cat);
+
+      }
+    })();
+  }
+
+
+  const handleProductPress = (product) => {
+    navigation.navigate("productdetail", { product: product });
+  };
   useEffect(() => {
     fetchCategory();
-    // console.log(NewProducts);
-    // const result = NewProducts.filter((pro) => pro.category_id ==selectedTab?.id);
-    // console.log(result);
-    // set_product_cat(result);
   }, [selectedTab]);
   return (
     <View style={styles.container}>
@@ -104,77 +119,60 @@ const CategoriesScreen = ({ navigation, route }) => {
           )}
         />
         <View style={styles.noItemContainer}>
-          <View
-            style={{
-              display: "flex",
-              justifyContent: "center",
-              alignItems: "center",
-              backgroundColor: colors.white,
-              height: 150,
-              width: 150,
-              borderRadius: 10,
-            }}
-          >
-            <Text style={styles.emptyBoxText}>
-              There no product in this category
-            </Text>
-            {/* {NewProducts.filter(
-              (product) => product?.category_id == selectedTab?.id
-            ).length === 0 ? (
-              <View style={styles.noItemContainer}>
-                <View
-                  style={{
-                    display: "flex",
-                    justifyContent: "center",
-                    alignItems: "center",
-                    backgroundColor: colors.white,
-                    height: 150,
-                    width: 150,
-                    borderRadius: 10,
-                  }}
-                >
+          {products_cat.length === 0 ? (
+            <View style={styles.noItemContainer}>
+              <View
+                style={{
+                  display: "flex",
+                  justifyContent: "center",
+                  alignItems: "center",
+                  backgroundColor: colors.white,
+                  height: 150,
+                  width: 150,
+                  borderRadius: 10,
+                }}
+              >
 
-                  <Text style={styles.emptyBoxText}>
-                    There no product in this category
-                  </Text>
-                </View>
+                <Text style={styles.emptyBoxText}>
+                  There no product in this category
+                </Text>
               </View>
-            ) : (
-              <FlatList
-                data={foundItems.filter(
-                  (product) => product?.category_id === selectedTab?.id
-                )}
-                refreshControl={
-                  <RefreshControl
-                    refreshing={refeshing}
-                    onRefresh={handleOnRefresh}
+            </View>
+          ) : (
+            <FlatList
+              data={products_cat}
+              refreshControl={
+                <RefreshControl
+                  refreshing={refeshing}
+                  onRefresh={() => handleOnRefresh()}
+                />
+              }
+              keyExtractor={(index, item) => `${index}-${item}`}
+              contentContainerStyle={{ margin: 10 }}
+              numColumns={2}
+              renderItem={({ item: product }) => (
+                <View
+                  style={[
+                    styles.productCartContainer,
+                    { width: (windowWidth - windowWidth * 0.1) / 2 },
+                  ]}
+                >
+                  <ProductCard
+                    cardSize={"large"}
+                    name={product.product_name}
+                    image={product.product_image}
+                    price={product.price_in_store}
+                    quantity={product.qty}
+                    onPress={() => handleProductPress(product)}
                   />
-                }
-                keyExtractor={(index, item) => `${index}-${item}`}
-                contentContainerStyle={{ margin: 10 }}
-                numColumns={2}
-                renderItem={({ item: product }) => (
-                  <View
-                    style={[
-                      styles.productCartContainer,
-                    ]}
-                  >
-                    <ProductCard
-                      cardSize={"large"}
-                      name={product.product_name}
-                      image={product.image}
-                      price={product.price_in_store}
-                      quantity={product.qty}
-                    />
-                    <View style={styles.emptyView}></View>
-                  </View>
-                )}
-              />
-            )} */}
-          </View>
+                  <View style={styles.emptyView}></View>
+                </View>
+              )}
+            />
+          )}
         </View>
-
       </View>
+
     </View>
   );
 };

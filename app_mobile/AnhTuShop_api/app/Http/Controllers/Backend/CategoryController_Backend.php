@@ -8,6 +8,7 @@ use App\Models\Product;
 use Illuminate\Http\Request;
 use Illuminate\Support\Str;
 use Illuminate\Support\Facades\DB;
+
 class CategoryController_Backend extends Controller
 {
 
@@ -42,10 +43,10 @@ class CategoryController_Backend extends Controller
     public function store(Request $request)
     {
         $category = new Category();
-        $category->name = $request->name; 
+        $category->name = $request->name;
         $category->slug = Str::of($request->name)->slug("-");
-         $category->sort_order = 0; 
-        $category->description = $request->description; 
+        $category->sort_order = 0;
+        $category->description = $request->description;
         $files = $request->image;
         if ($files != null) {
             $extension = $files->getClientOriginalExtension();
@@ -74,7 +75,7 @@ class CategoryController_Backend extends Controller
         $category = Category::find($id);
 
         $category->name = $request->name; //form
-        $category->description = $request->description; 
+        $category->description = $request->description;
         $category->slug = Str::of($request->name)->slug('-');
 
         $files = $request->image;
@@ -114,45 +115,67 @@ class CategoryController_Backend extends Controller
     //xoa
     public function destroy($id)
     {
+        $listId = array();
         $brand = DB::table('category')->where('id', $id);
         if ($brand->count() > 0) {
-            if($brand->where('status',1)->count() > 0) {
-                $check_brand = DB::table('product')->where('category_id', $id);
+            if ($brand->where('status', 1)->count() > 0) {
+
+                $args_cat1 = [
+                    ['parent_id', '=', $id],
+                    ['status', '=', 1]
+                ];
+                $list_category1 = DB::table('category')->where($args_cat1)->get();
+                if (count($list_category1) > 0) {
+                    foreach ($list_category1 as $row1) {
+                        array_push($listId, $row1->id);
+                        $args_cat2 = [
+                            ['parent_id', '=', $row1->id],
+                            ['status', '=', 1]
+                        ];
+                        $list_category2 = Category::where($args_cat2)->get();
+                        if (count($list_category2) > 0) {
+                            foreach ($list_category2 as $row2) {
+                                array_push($listId, $row2->id);
+                            }
+                        }
+                    }
+                }
+                $check_brand = DB::table('product')->whereIn('category_id', $listId);
                 if ($check_brand->count() > 0) {
                     return response()->json(
-    
+
                         ['success' => false, 'message' => "Xóa dữ liệu không thành công, còn sản phẩm có thuộc tính của category này. ", 'brand_data' => $id],
                         200
-    
+
                     );
                 } else {
-                    $deleted_brand = DB::table('category')->where('id',"=", $id)->update([
+                    $deleted_brand = DB::table('category')->where('id', "=", $id)->update([
                         'status' => 0
                     ]);
                     return response()->json(
-    
+
                         ['success' => true, 'message' => "Chuyển dữ liệu vào thùng rác thành công", 'brand_data' => $deleted_brand],
                         200
-    
+
                     );
                 }
-            }else if(DB::table('category')->where([['id',"=", $id],['status',"=",0]])->count() > 0) {
-                $deleted_brand = DB::table('brand')->where([['id',"=", $id],['status',"=",0]])->delete();
+            } else if (DB::table('category')->where([['id', "=", $id], ['status', "=", 0]])->count() > 0) {
+                $deleted_brand = DB::table('brand')->where([['id', "=", $id], ['status', "=", 0]])->delete();
                 return response()->json(
 
                     ['success' => true, 'message' => "Xóa dữ liệu trong thùng rác thành công.", 'brand_data' => $deleted_brand],
                     200
 
-                ); 
-            }else{
+                );
+            } else {
                 return response()->json(
 
                     ['success' => false, 'message' => "Xóa dữ liệu không thành công, mã category này không tồn tại.", 'brand_data' => null],
                     200
-    
+
                 );
             }
-           
+
         } else {
             return response()->json(
 
@@ -202,7 +225,7 @@ class CategoryController_Backend extends Controller
                 'success' => true,
                 'message' => "tai du lieu thanh cong",
                 'categories_data' => $categories
-               
+
             ],
             200
 
@@ -212,5 +235,5 @@ class CategoryController_Backend extends Controller
     }
 
 
-    
+
 }

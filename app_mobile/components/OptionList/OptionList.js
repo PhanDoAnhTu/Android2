@@ -17,7 +17,7 @@ const OptionList = ({
       {type == "morden" ? (
         <View style={[styles.container, { backgroundColor: colors.white }]}>
           <View style={styles.IconContainer}>
-            <Icon name={iconName} size={24} color={colors.primary} />
+            <Icon name={iconName} size={24} color={colors.secondary} />
             <Text style={styles.listText}>{text}</Text>
           </View>
           <View style={styles.buttonContainer}>
@@ -81,7 +81,7 @@ const styles = StyleSheet.create({
     marginLeft: 10,
     fontSize: 15,
     fontWeight: "bold",
-    color: colors.secondary,
+    color: colors.muted,
   },
   buttonContainer: {
     display: "flex",
@@ -94,7 +94,7 @@ const styles = StyleSheet.create({
     marginLeft: 5,
     height: 30,
     width: 30,
-    backgroundColor: colors.primary,
+    backgroundColor: colors.secondary,
     borderRadius: 5,
     elevation: 2,
   },

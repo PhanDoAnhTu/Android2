@@ -27,6 +27,8 @@ const OrderScreen = ({ navigation, route }) => {
   };
 
   const handleOrderDetail = (order, order_detail, order_total) => {
+    navigation.navigate("orderdetail", { order_detail: { order, order_detail, order_total } });
+
   };
 
 
@@ -47,7 +49,7 @@ const OrderScreen = ({ navigation, route }) => {
   return (
     <View style={styles.container}>
       <StatusBar></StatusBar>
-      <ProgressDialog />
+      {/* <ProgressDialog /> */}
       <View style={styles.topBarContainer}>
         <TouchableOpacity
           onPress={() => {

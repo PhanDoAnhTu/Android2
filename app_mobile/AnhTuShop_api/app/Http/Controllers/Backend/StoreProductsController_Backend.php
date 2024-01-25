@@ -107,7 +107,7 @@ class StoreProductsController_Backend extends Controller
     public function getProductAndStoreProduct()
     {
 
-        $productcategory = DB::table("product")->where([["product.status", 1], ["category.status", '=', 1]])->join("category", "product.category_id", '=', 'category.id')->select("product.id as id", "product.name as product_name", 'category.name as category', 'brand_id', 'product.price as price', 'product.short_description as short_description', 'product.detail as detail')->orderByDesc('product.created_at');
+        $productcategory = DB::table("product")->where([["product.status", 1], ["category.status", '=', 1]])->join("category", "product.category_id", '=', 'category.id')->select("product.id as id","product.image as product_image", "product.name as product_name", 'category.name as category', 'brand_id', 'product.price as price', 'product.short_description as short_description', 'product.detail as detail')->orderByDesc('product.created_at');
 
         $products = DB::table('brand')
             ->JoinSub($productcategory, 'productcategory', function (JoinClause $join) {
